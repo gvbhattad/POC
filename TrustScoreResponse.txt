@@ -1,0 +1,54 @@
+
+package com.example.excelprocessor.model.trustscore;
+
+import lombok.Data;
+
+@Data
+public class TrustScoreResponse {
+    private String transid;
+    private String refNum;
+    private String pJIndicator;
+    private CslStatus cslStatus;
+    private String clientId;
+    private TrustScoreResponseBody trustscoreResponse;
+
+    @Data
+    public static class CslStatus {
+        private String code;
+        private String description;
+    }
+
+    @Data
+    public static class TrustScoreResponseBody {
+        private String description;
+        private Object additionalInfo;
+        private String requestId;
+        private String status;
+        private ResponseDetails response;
+    }
+
+    @Data
+    public static class ResponseDetails {
+        private String transactionId;
+        private String phoneNumber;
+        private String lineType;
+        private String carrier;
+        private String countryCode;
+        private String trustScore;
+        private String reasonCode;
+        private String payfoneAlias;
+        private String statusIndex;
+        private String isBaseLined;
+        private String carrierStatus;
+        private String phoneNumberVelocity;
+        private Integer portVelocity;
+        private Integer simVelocity;
+        private Integer deviceVelocity;
+        private String portedDate;
+        private String payfoneTenure;
+        private String carrierTenure;
+        private String phoneNumberTenure;
+        private String simTenure;
+        private String deviceTenure;
+    }
+}

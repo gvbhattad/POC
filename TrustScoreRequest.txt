@@ -1,0 +1,26 @@
+
+package com.example.excelprocessor.model.trustscore;
+
+import lombok.Data;
+
+@Data
+public class TrustScoreRequest {
+    private Header header = new Header();
+    private TrustScoreRequestBody trustScoreRequest = new TrustScoreRequestBody();
+
+    @Data
+    public static class Header {
+        private String transID;
+        private String userName = "csl_user";
+        private String password = "csluser5";
+        private String refNum = "CSLTest";
+        private String plindicator = "POO";
+        private String clientid = "PhoneConfirm";
+    }
+
+    @Data
+    public static class TrustScoreRequestBody {
+        private String phoneNumber;
+    }
+}
+}

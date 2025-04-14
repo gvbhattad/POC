@@ -1,0 +1,16 @@
+
+package com.example.excelprocessor.model;
+
+import lombok.Data;
+
+@Data
+public class ExcelRecord {
+    private String accountNumber;
+    private String phoneNumber;
+    private String lineType = "Mobile"; // Default
+    private Boolean confirmed = true;   // Default
+    private String ssn;                 // Optional
+    private String dob;                 // Optional
+    private String channelId = "Default"; // Default
+    private String status;
+}

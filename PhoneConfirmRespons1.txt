@@ -1,0 +1,22 @@
+
+package com.example.excelprocessor.model.phoneconfirm;
+
+import lombok.Data;
+
+@Data
+public class PhoneConfirmResponse {
+    private String responseCode;
+    private String responseDesc;
+    private String transId;
+    private PhoneDetails PhoneDetails;
+
+    @Data
+    public static class PhoneDetails {
+        private boolean confirmed;
+        private String lineType;
+        private String trustScore;
+        private String source;
+        private String payfoneIdMatch;
+    }
+}
+}

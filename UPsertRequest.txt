@@ -1,0 +1,79 @@
+
+package com.example.excelprocessor.model.upsert;
+
+import lombok.Data;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Data
+public class UpsertRequest {
+    private String transid;
+    private String eventName;
+    private String eventTimestamp;
+    private String serverName = "10.245.45";
+    private String action = "insert";
+    private RequestMetadata requestMetadata = new RequestMetadata();
+    private RequestBody request = new RequestBody();
+
+    @Data
+    public static class RequestMetadata {
+        private Version version = new Version();
+    }
+
+    @Data
+    public static class Version {
+        private String major = "1";
+        private String minor = "1";
+        private String patch = "0";
+        private String versionDate;
+
+        public Version() {
+            this.versionDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        }
+    }
+
+    @Data
+    public static class RequestBody {
+        private String accountnumber;
+        private String payfoneid;
+        private String phonenumber;
+        private String lineType = "Mobile";
+        private String carrier = "T-Mobile USA";
+        private String countrycode = "US";
+        private String verified = "TRUE";
+        private String namescore = "100";
+        private String addressScore = "-1";
+        private String eventType = "TN_PORT";
+        private String ssn = "123456789";
+        private String dob = "1970-01-01";
+        private String lexid = "123456";
+        private String syfid = "GUIUSER";
+        private String tokenid = "GuiUserToken";
+        private String Clientid = "F10SAMCO";
+        private String sys = "0000";
+        private String prin = "1000";
+        private String agent = "0000";
+        private String loaddatetime;
+        private String details = "";
+        private String eventdate = "";
+        private String eventadditionalInfo = "";
+        private String reasoncodes = "ACINA|pg";
+        private String lastcalldate = "";
+        private String statusflag = "";
+        private String acct_type = "PLCC";
+        private String cif = "";
+        private String phnsource = "";
+        private String firstloaddate = "";
+        private String velocity = "";
+        private String firstauthdate = "";
+        private String contaacttibility = "";
+        private String acctopendate = "";
+        private String emailsource = "";
+        private String emailloaddate = "";
+        private String reubenrefreshdate = "";
+
+        public RequestBody() {
+            this.loaddatetime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        }
+    }
+}

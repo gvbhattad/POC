@@ -1,0 +1,9 @@
+
+server:
+  port: 8080
+
+application:
+  payfoneTrustScoreUrl: https://payfonetrustscore-ga.app.dev.use1.pcf.syfbank.com/payfoneTrustScore/phoneConfirm
+  payfoneUpsertUrl: https://edipayfoneupsertservice.app.uat.pcf.syfbank.com/Ravtoneuesert/insertlavteneResard
+  phoneConfirmUrl: https://phoneconfirm.app.uat.pcf.syfbank.com/PhoneConfirm/confirmNumber
+  eventName: PayfoneRataService.JavaAPI.Insert

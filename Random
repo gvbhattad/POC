@@ -1,0 +1,95 @@
+import org.junit.Test;
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+
+public class OrchestratorServiceGRTest {
+
+    @Test
+    public void testBypassAniCheck_deadAni() {
+        // Arrange
+        GRRequestDataObj data = mock(GRRequestDataObj.class);
+        String phoneNumer = "1234567890";
+        List<String> aniTypeList = Arrays.asList("deadani");
+        List<String> fraudAniList = Arrays.asList("deadani");
+
+        when(CollectionUtils.containsAny(aniTypeList, fraudAniList)).thenReturn(true);
+
+        // Act
+        String result = OrchestratorServiceGR.bypassAniCheck(data, phoneNumer);
+
+        // Assert
+        verify(data).setResponseFrom(AniMatchConstants.DEAD_ANI);
+        assertEquals(ivRResponseHandler.authResponse(AniMatchConstants.BYPASS_ANI_MATCH_CODE, AniMatchConstants.DEAD_ANI, data), result);
+    }
+
+    @Test
+    public void testBypassAniCheck_fraudAni() {
+        // Arrange
+        GRRequestDataObj data = mock(GRRequestDataObj.class);
+        String phoneNumer = "1234567890";
+        List<String> aniTypeList = Arrays.asList("fraudani");
+        List<String> fraudAniList = Arrays.asList("fraudani");
+
+        when(CollectionUtils.containsAny(aniTypeList, fraudAniList)).thenReturn(true);
+
+        // Act
+        String result = OrchestratorServiceGR.bypassAniCheck(data, phoneNumer);
+
+        // Assert
+        verify(data).setResponseFrom(AniMatchConstants.FRAUD_NEW_ANI);
+        assertEquals(ivRResponseHandler.authResponse(AniMatchConstants.BYPASS_ANI_MATCH_CODE, AniMatchConstants.FRAUD_NEW_ANI, data), result);
+    }
+
+    @Test
+    public void testBypassAniCheck_webSurveillance() {
+        // Arrange
+        GRRequestDataObj data = mock(GRRequestDataObj.class);
+        String phoneNumer = "1234567890";
+        List<String> aniTypeList = Arrays.asList("websurveillance");
+        List<String> fraudAniList = Arrays.asList("websurveillance");
+
+        when(CollectionUtils.containsAny(aniTypeList, fraudAniList)).thenReturn(true);
+
+        // Act
+        String result = OrchestratorServiceGR.bypassAniCheck(data, phoneNumer);
+
+        // Assert
+        verify(data).setResponseFrom(AniMatchConstants.WEB_ANI);
+        assertEquals(ivRResponseHandler.authResponse(AniMatchConstants.BYPASS_ANI_MATCH_CODE, AniMatchConstants.WEB_ANI, data), result);
+    }
+
+    @Test
+    public void testBypassAniCheck_bypassNg() {
+        // Arrange
+        GRRequestDataObj data = mock(GRRequestDataObj.class);
+        String phoneNumer = "1234567890";
+        List<String> aniTypeList = Arrays.asList("bypassNg");
+        List<String> ngAniList = Arrays.asList("bypassNg");
+
+        when(CollectionUtils.containsAny(aniTypeList, ngAniList)).thenReturn(true);
+
+        // Act
+        String result = OrchestratorServiceGR.bypassAniCheck(data, phoneNumer);
+
+        // Assert
+        verify(data).setResponseFrom(AniMatchConstants.BYPASS_NG);
+        assertEquals(AniMatchConstants.BYPASS_NG, result);
+    }
+
+    @Test
+    public void testBypassAniCheck_noMatch() {
+        // Arrange
+        GRRequestDataObj data = mock(GRRequestDataObj.class);
+        String phoneNumer = "1234567890";
+        List<String> aniTypeList = Arrays.asList("noMatch");
+        List<String> fraudAniList = Arrays.asList("fraudani");
+
+        when(CollectionUtils.containsAny(aniTypeList, fraudAniList)).thenReturn(false);
+
+        // Act
+        String result = OrchestratorServiceGR.bypassAniCheck(data, phoneNumer);
+
+        // Assert
+        assertNull(result);
+    }
+}

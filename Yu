@@ -1,0 +1,30 @@
+public void enrollVerified(@RequestBody String req) throws IOException {
+    ObjectMapper mapper = new ObjectMapper();
+    String reqSanitized = JsonSanitizer.sanitize(req);
+    EnrollVerified request = mapper.readValue(reqSanitized, EnrollVerified.class);
+
+    // Input validation
+    if (request == null) {
+        LOGGER.error("Invalid request body");
+        return;
+    }
+
+    try {
+        request.getVerifyResponse().setPayToneTransID(mapper.readTree(reqSanitized).path(AccAuthConstants.TRANSACTIONID).asText());
+        request.getVerifyResponse().setNameScore(mapper.readTree(reqSanitized).path(AccAuthConstants.VERIFYRESPONSE).path(AccAuthConstants.NAME).path(AccAuthConstants.NAMESCORE).asText());
+        request.getVerifyResponse().setAddressscore(mapper.readTree(reqSanitized).path(AccAuthConstants.VERIFYRESPONSE).path(AccAuthConstants.ADDRESS_SCORE).asText());
+        request.getVerifyResponse().setVerifyAddress(mapper.readTree(reqSanitized).path(AccAuthConstants.VERIFY_ADDRESS).asText());
+
+        if (StringUtils.isEmpty(request.getAccountnumber()) && StringUtils.isEmpty(request.getCif())) {
+            LOGGER.error("Transaction Id : {} : Enroll Verified Validation Error - Either AccountNumber or CIF should be present : {}", request.getTransId());
+        } else {
+            if (realtimeEnrollProp.getEnrollVerifiedChannels().stream().anyMatch(request.getChannelId()::equalsIgnoreCase)) {
+                enrollVerified.enroll(request);
+            } else {
+                LOGGER.info("Channel ID is not enabled for Enrollment : {} for transID : {}", request.getChannelId(), request.getTransId());
+            }
+        }
+    } catch (Exception e) {
+        LOGGER.error("Error occurred during enrollment verification", e);
+    }
+}

@@ -1,0 +1,97 @@
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.io.IOException;
+
+@RunWith(MockitoJUnitRunner.class)
+public class EnrollVerifiedTest {
+
+    @InjectMocks
+    private EnrollVerified enrollVerified;
+
+    @Mock
+    private ObjectMapper mapper;
+
+    @Mock
+    private JsonSanitizer jsonSanitizer;
+
+    @Mock
+    private RealtimeEnrollProp realtimeEnrollProp;
+
+    @Mock
+    private LOGGER logger;
+
+    @Before
+    public void setup() {
+        when(realtimeEnrollProp.getEnrollVerifiedChannels()).thenReturn(Arrays.asList("CHANNEL1", "CHANNEL2"));
+    }
+
+    @Test
+    public void testEnrollVerified_Success() throws IOException {
+        // Given
+        String req = "{\"verifyResponse\":{\"payfoneTransID\":\"12345\",\"nameScore\":\"John Doe\",\"addressScore\":\"123 Main St\"},\"accountNumber\":\"1234567890\",\"cif\":\" CIF123\"}";
+        EnrollVerified request = new EnrollVerified();
+        request.getVerifyResponse().setPayfoneTransID("12345");
+        request.getVerifyResponse().setNameScore("John Doe");
+        request.getVerifyResponse().setAddressScore("123 Main St");
+        request.setAccountNumber("1234567890");
+        request.setCif("CIF123");
+        request.setChannelId("CHANNEL1");
+
+        when(mapper.readValue(anyString(), eq(EnrollVerified.class))).thenReturn(request);
+
+        // When
+        enrollVerified.enrollVerified(req);
+
+        // Then
+        verify(enrollVerified, times(1)).enroll(request);
+    }
+
+    @Test
+    public void testEnrollVerified_ValidationError() throws IOException {
+        // Given
+        String req = "{\"verifyResponse\":{\"payfoneTransID\":\"12345\",\"nameScore\":\"John Doe\",\"addressScore\":\"123 Main St\"},\"accountNumber\":\"\",\"cif\":\"\"}";
+        EnrollVerified request = new EnrollVerified();
+        request.getVerifyResponse().setPayfoneTransID("12345");
+        request.getVerifyResponse().setNameScore("John Doe");
+        request.getVerifyResponse().setAddressScore("123 Main St");
+        request.setAccountNumber("");
+        request.setCif("");
+
+        when(mapper.readValue(anyString(), eq(EnrollVerified.class))).thenReturn(request);
+
+        // When
+        enrollVerified.enrollVerified(req);
+
+        // Then
+        verify(logger, times(1)).error(anyString());
+    }
+
+    @Test
+    public void testEnrollVerified_ChannelNotEnabled() throws IOException {
+        // Given
+        String req = "{\"verifyResponse\":{\"payfoneTransID\":\"12345\",\"nameScore\":\"John Doe\",\"addressScore\":\"123 Main St\"},\"accountNumber\":\"1234567890\",\"cif\":\"CIF123\"}";
+        EnrollVerified request = new EnrollVerified();
+        request.getVerifyResponse().setPayfoneTransID("12345");
+        request.getVerifyResponse().setNameScore("John Doe");
+        request.getVerifyResponse().setAddressScore("123 Main St");
+        request.setAccountNumber("1234567890");
+        request.setCif("CIF123");
+        request.setChannelId("CHANNEL3");
+
+        when(mapper.readValue(anyString(), eq(EnrollVerified.class))).thenReturn(request);
+
+        // When
+        enrollVerified.enrollVerified(req);
+
+        // Then
+        verify(logger, times(1)).info(anyString());
+    }
+}

@@ -1,0 +1,50 @@
+server:
+  port: 8080
+
+# Application specific properties
+app:
+  # --- CORE PROCESSING SETTINGS ---
+  processing:
+    # Mode can be SEQUENTIAL or BATCH
+    mode: SEQUENTIAL
+    record-limit: 100
+    wait-time-ms: 10000 # 10 seconds
+
+  # --- API ENDPOINTS ---
+  # NOTE: The mock client does not use these URLs, but a real client would.
+  # For testing the mock, the mock controller endpoints will be used automatically.
+  api1:
+    url: "http://localhost:8080/mock/api1/insertPayfoneRecord"
+  api2:
+    url: "http://localhost:8080/mock/api2/confirmNumber"
+
+  # --- STATIC & DEFAULT VALUES FOR API PAYLOADS ---
+  api-defaults:
+    api1:
+      eventName: "PayfoneDataService.JavaAPI.Insert"
+      serverName: "10.245.345"
+      action: "insert"
+      version:
+        major: "1"
+        minor: "1"
+        patch: "0"
+      carrier: "T-Mobile USA"
+      countryCode: "US"
+      nameScore: "100"
+      addressScore: "-1"
+      eventType: "TN_PORT"
+      defaultSsn: "123456789"
+      defaultDob: "1970-01-01"
+      lexId: "123456"
+      syfId: "GUIUSER"
+      tokenId: "GUIUSERToken"
+      clientId: "F10SAMCO"
+      sys: "0000"
+      agent: "0000"
+
+    api2:
+      clientId: "F10SAMCO"
+      channelId: "TR-UL"
+      consentType: "optedOut"
+      defaultSsn: "123456789"
+      defaultDob: "1970-01-01"

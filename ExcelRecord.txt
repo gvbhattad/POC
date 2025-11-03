@@ -1,16 +1,39 @@
+package com.syf.payfone.model;
 
-package com.example.excelprocessor.model;
+import java.util.Map;
 
-import lombok.Data;
-
-@Data
-public class ExcelRecord {
-    private String accountNumber;
-    private String phoneNumber;
-    private String lineType = "Mobile"; // Default
-    private Boolean confirmed = true;   // Default
-    private String ssn;                 // Optional
-    private String dob;                 // Optional
-    private String channelId = "Default"; // Default
-    private String status;
+/**
+ * Base interface for Excel records following Interface Segregation Principle
+ */
+public interface ExcelRecord {
+    String getPhoneNumber();
+    String getLineType();
+    String getConfirmed();
+    String getSsn();
+    String getDob();
+    String getChannelId();
+    String getTransactionId();
+    String getStatus();
+    void setTransactionId(String transactionId);
+    void setStatus(String status);
+    
+    /**
+     * Get the identifier field value (AccountNumber or CIF)
+     */
+    String getIdentifier();
+    
+    /**
+     * Convert to map for easy processing
+     */
+    Map<String, String> toMap();
+    
+    /**
+     * Validate mandatory fields
+     */
+    boolean isValid();
+    
+    /**
+     * Get validation error message
+     */
+    String getValidationError();
 }

@@ -1,0 +1,94 @@
+package com.syf.payfone.controller;
+
+import com.syf.payfone.model.AccountNumberRecord;
+import com.syf.payfone.service.ExcelProcessingService;
+import com.syf.payfone.service.parser.impl.AccountNumberExcelParser;
+import com.syf.payfone.service.processor.impl.DefaultRecordProcessor;
+import com.syf.payfone.service.writer.impl.DefaultExcelWriter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.ByteArrayOutputStream;
+
+/**
+ * REST Controller for Account Number based processing (API 1)
+ * Endpoint: /api/v1/process/account-number
+ */
+@RestController
+@RequestMapping("/api/v1/process")
+public class AccountNumberController {
+    
+    private static final Logger log = LoggerFactory.getLogger(AccountNumberController.class);
+    
+    private final ExcelProcessingService<AccountNumberRecord> processingService;
+    private final AccountNumberExcelParser parser;
+    private final DefaultRecordProcessor<AccountNumberRecord> processor;
+    private final DefaultExcelWriter<AccountNumberRecord> writer;
+    
+    public AccountNumberController(
+            ExcelProcessingService<AccountNumberRecord> processingService,
+            AccountNumberExcelParser parser,
+            DefaultRecordProcessor<AccountNumberRecord> processor,
+            DefaultExcelWriter<AccountNumberRecord> writer) {
+        this.processingService = processingService;
+        this.parser = parser;
+        this.processor = processor;
+        this.writer = writer;
+    }
+    
+    @PostMapping(value = "/account-number", 
+                 consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
+                 produces = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+    public ResponseEntity<byte[]> processAccountNumberExcel(
+            @RequestParam("file") MultipartFile file) {
+        
+        try {
+            log.info("Received request to process Account Number Excel: {}", 
+                file.getOriginalFilename());
+            
+            // Validate file
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().build();
+            }
+            
+            if (!isValidExcelFile(file)) {
+                return ResponseEntity.badRequest()
+                    .header("X-Error-Message", "Invalid file type. Please upload an Excel file (.xlsx)")
+                    .build();
+            }
+            
+            // Process Excel
+            ByteArrayOutputStream output = processingService.processExcel(
+                file, parser, processor, writer
+            );
+            
+            // Prepare response
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"));
+            headers.setContentDispositionFormData("attachment", 
+                "processed_" + file.getOriginalFilename());
+            headers.setCacheControl("must-revalidate, post-check=0, pre-check=0");
+            
+            return new ResponseEntity<>(output.toByteArray(), headers, HttpStatus.OK);
+            
+        } catch (Exception e) {
+            log.error("Error processing Account Number Excel", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .header("X-Error-Message", "Error processing file: " + e.getMessage())
+                .build();
+        }
+    }
+    
+    private boolean isValidExcelFile(MultipartFile file) {
+        String filename = file.getOriginalFilename();
+        return filename != null && 
+               (filename.endsWith(".xlsx") || filename.endsWith(".xls"));
+    }
+}

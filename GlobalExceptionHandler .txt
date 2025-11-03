@@ -1,0 +1,57 @@
+package com.syf.payfone.exception;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Global exception handler for the application
+ * Follows Single Responsibility Principle
+ */
+@ControllerAdvice
+public class GlobalExceptionHandler {
+    
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
+    
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<Map<String, String>> handleMaxUploadSizeExceeded(
+            MaxUploadSizeExceededException ex) {
+        log.error("File size exceeded", ex);
+        
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "File size exceeded");
+        error.put("message", "Maximum upload size is 10MB");
+        
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE).body(error);
+    }
+    
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, String>> handleIllegalArgument(
+            IllegalArgumentException ex) {
+        log.error("Invalid argument", ex);
+        
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Invalid request");
+        error.put("message", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(error);
+    }
+    
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleGenericException(Exception ex) {
+        log.error("Unexpected error", ex);
+        
+        Map<String, String> error = new HashMap<>();
+        error.put("error", "Internal server error");
+        error.put("message", "An unexpected error occurred");
+        
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+    }
+}

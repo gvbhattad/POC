@@ -1,0 +1,171 @@
+package com.syf.payfone.dto;
+
+import lombok.Data;
+import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Data
+@Builder
+public class PayfoneRequest {
+    @JsonProperty("transId")
+    private String transId;
+    
+    @JsonProperty("eventName")
+    private String eventName;
+    
+    @JsonProperty("eventTimestamp")
+    private String eventTimestamp;
+    
+    @JsonProperty("serverName")
+    private String serverName;
+    
+    @JsonProperty("action")
+    private String action;
+    
+    @JsonProperty("requestMetadata")
+    private RequestMetadata requestMetadata;
+    
+    @JsonProperty("request")
+    private PayfoneRecordRequest request;
+    
+    @Data
+    @Builder
+    public static class RequestMetadata {
+        @JsonProperty("version")
+        private Version version;
+    }
+    
+    @Data
+    @Builder
+    public static class Version {
+        @JsonProperty("major")
+        private String major;
+        
+        @JsonProperty("minor")
+        private String minor;
+        
+        @JsonProperty("patch")
+        private String patch;
+        
+        @JsonProperty("versionDate")
+        private String versionDate;
+    }
+    
+    @Data
+    @Builder
+    public static class PayfoneRecordRequest {
+        @JsonProperty("accountnumber")
+        private String accountnumber;
+        
+        @JsonProperty("payfoneid")
+        private String payfoneid;
+        
+        @JsonProperty("phonenumber")
+        private String phonenumber;
+        
+        @JsonProperty("linetype")
+        private String linetype;
+        
+        @JsonProperty("carrier")
+        private String carrier;
+        
+        @JsonProperty("countrycode")
+        private String countrycode;
+        
+        @JsonProperty("verified")
+        private String verified;
+        
+        @JsonProperty("namescore")
+        private String namescore;
+        
+        @JsonProperty("addressscore")
+        private String addressscore;
+        
+        @JsonProperty("eventtype")
+        private String eventtype;
+        
+        @JsonProperty("ssn")
+        private String ssn;
+        
+        @JsonProperty("dob")
+        private String dob;
+        
+        @JsonProperty("lexid")
+        private String lexid;
+        
+        @JsonProperty("syfid")
+        private String syfid;
+        
+        @JsonProperty("tokenid")
+        private String tokenid;
+        
+        @JsonProperty("clientid")
+        private String clientid;
+        
+        @JsonProperty("sys")
+        private String sys;
+        
+        @JsonProperty("prin")
+        private String prin;
+        
+        @JsonProperty("agent")
+        private String agent;
+        
+        @JsonProperty("loaddatetime")
+        private String loaddatetime;
+        
+        @JsonProperty("details")
+        private String details;
+        
+        @JsonProperty("eventdate")
+        private String eventdate;
+        
+        @JsonProperty("eventadditionalInfo")
+        private String eventadditionalInfo;
+        
+        @JsonProperty("reasoncodes")
+        private String reasoncodes;
+        
+        @JsonProperty("lastcalldate")
+        private String lastcalldate;
+        
+        @JsonProperty("statusflag")
+        private String statusflag;
+        
+        @JsonProperty("acct_type")
+        private String acct_type;
+        
+        @JsonProperty("cif")
+        private String cif;
+        
+        @JsonProperty("phnsource")
+        private String phnsource;
+        
+        @JsonProperty("firstloaddate")
+        private String firstloaddate;
+        
+        @JsonProperty("velocity")
+        private String velocity;
+        
+        @JsonProperty("firstauthdate")
+        private String firstauthdate;
+        
+        @JsonProperty("contactibility")
+        private String contactibility;
+        
+        @JsonProperty("acctopendate")
+        private String acctopendate;
+        
+        @JsonProperty("email")
+        private String email;
+        
+        @JsonProperty("emailsource")
+        private String emailsource;
+        
+        @JsonProperty("emailloaddate")
+        private String emailloaddate;
+        
+        @JsonProperty("reubenrefreshdate")
+        private String reubenrefreshdate;
+    }
+}

@@ -1,0 +1,19 @@
+package com.syf.payfone.service.parser;
+
+import com.syf.payfone.model.ExcelRecord;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Functional interface for parsing Excel files
+ * @param <T> Type of ExcelRecord
+ */
+@FunctionalInterface
+public interface ExcelParser<T extends ExcelRecord> {
+    /**
+     * Parse Excel file and return list of records
+     */
+    List<T> parse(MultipartFile file) throws IOException;
+}

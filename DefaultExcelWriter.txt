@@ -1,0 +1,101 @@
+package com.syf.payfone.service.writer.impl;
+
+import com.syf.payfone.model.AccountNumberRecord;
+import com.syf.payfone.model.CifRecord;
+import com.syf.payfone.model.ExcelRecord;
+import com.syf.payfone.service.writer.ExcelWriter;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Component;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+@Component
+public class DefaultExcelWriter<T extends ExcelRecord> implements ExcelWriter<T> {
+
+    @Override
+    public ByteArrayOutputStream write(List<T> records) throws IOException {
+        if (records.isEmpty()) {
+            throw new IllegalArgumentException("No records to write");
+        }
+        
+        try (Workbook workbook = new XSSFWorkbook()) {
+            Sheet sheet = workbook.createSheet("Results");
+            
+            // Determine record type and create appropriate headers
+            T firstRecord = records.get(0);
+            boolean isAccountNumberRecord = firstRecord instanceof AccountNumberRecord;
+            
+            // Create header row
+            Row headerRow = sheet.createRow(0);
+            createHeaderRow(headerRow, isAccountNumberRecord);
+            
+            // Create data rows
+            for (int i = 0; i < records.size(); i++) {
+                Row row = sheet.createRow(i + 1);
+                createDataRow(row, records.get(i), isAccountNumberRecord);
+            }
+            
+            // Auto-size columns
+            int columnCount = isAccountNumberRecord ? 9 : 9;
+            for (int i = 0; i < columnCount; i++) {
+                sheet.autoSizeColumn(i);
+            }
+            
+            // Write to output stream
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return outputStream;
+        }
+    }
+    
+    private void createHeaderRow(Row row, boolean isAccountNumberRecord) {
+        CellStyle headerStyle = row.getSheet().getWorkbook().createCellStyle();
+        Font font = row.getSheet().getWorkbook().createFont();
+        font.setBold(true);
+        headerStyle.setFont(font);
+        
+        String[] headers;
+        if (isAccountNumberRecord) {
+            headers = new String[]{
+                "AccountNumber", "PhoneNumber", "LineType", "Confirmed", 
+                "SSN", "DOB", "ChannelId", "TransactionID", "Status"
+            };
+        } else {
+            headers = new String[]{
+                "CIF", "PhoneNumber", "LineType", "Confirmed", 
+                "SSN", "DOB", "ChannelId", "TransactionID", "Status"
+            };
+        }
+        
+        for (int i = 0; i < headers.length; i++) {
+            Cell cell = row.createCell(i);
+            cell.setCellValue(headers[i]);
+            cell.setCellStyle(headerStyle);
+        }
+    }
+    
+    private void createDataRow(Row row, T record, boolean isAccountNumberRecord) {
+        int cellIndex = 0;
+        
+        // First column - AccountNumber or CIF
+        createCell(row, cellIndex++, record.getIdentifier());
+        
+        // Common columns
+        createCell(row, cellIndex++, record.getPhoneNumber());
+        createCell(row, cellIndex++, record.getLineType());
+        createCell(row, cellIndex++, record.getConfirmed());
+        createCell(row, cellIndex++, record.getSsn());
+        createCell(row, cellIndex++, record.getDob());
+        createCell(row, cellIndex++, record.getChannelId());
+        createCell(row, cellIndex++, record.getTransactionId());
+        createCell(row, cellIndex++, record.getStatus());
+    }
+    
+    private void createCell(Row row, int columnIndex, String value) {
+        Cell cell = row.createCell(columnIndex);
+        cell.setCellValue(value != null ? value : "");
+    }
+}

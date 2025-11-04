@@ -1,0 +1,19 @@
+package com.syf.payfone.service.writer;
+
+import com.syf.payfone.model.ExcelRecord;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.List;
+
+/**
+ * Functional interface for writing Excel files
+ * @param <T> Type of ExcelRecord
+ */
+@FunctionalInterface
+public interface ExcelWriter<T extends ExcelRecord> {
+    /**
+     * Write records to Excel file
+     */
+    ByteArrayOutputStream write(List<T> records) throws IOException;
+}

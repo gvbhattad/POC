@@ -1,0 +1,15 @@
+package com.syf.payfone.service.processor;
+
+import com.syf.payfone.model.ExcelRecord;
+
+/**
+ * Functional interface for processing individual records
+ * @param <T> Type of ExcelRecord
+ */
+@FunctionalInterface
+public interface RecordProcessor<T extends ExcelRecord> {
+    /**
+     * Process a single record (validate, call API, update status)
+     */
+    void process(T record);
+}

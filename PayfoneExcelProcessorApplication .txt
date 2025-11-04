@@ -1,0 +1,22 @@
+package com.syf.payfone;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+/**
+ * Main Spring Boot Application
+ * 
+ * This application provides REST APIs for processing Excel files with Payfone integration:
+ * - API 1: /api/v1/process/account-number - Processes Account Number based records
+ * - API 2: /api/v1/process/cif - Processes CIF based records
+ * 
+ * Both APIs accept Excel files, validate records, call Payfone API, and return 
+ * updated Excel files with Status and TransactionID columns.
+ */
+@SpringBootApplication
+public class PayfoneExcelProcessorApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(PayfoneExcelProcessorApplication.class, args);
+    }
+}

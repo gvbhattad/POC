@@ -1,0 +1,16 @@
+package com.syf.payfone.service.validator;
+
+import com.syf.payfone.model.ExcelRecord;
+
+/**
+ * Functional interface for validating records
+ * @param <T> Type of ExcelRecord
+ */
+@FunctionalInterface
+public interface RecordValidator<T extends ExcelRecord> {
+    /**
+     * Validate a record and set status if invalid
+     * @return true if valid, false otherwise
+     */
+    boolean validate(T record);
+}

@@ -1,0 +1,65 @@
+package com.syf.payfone.service.processor.impl;
+
+import com.syf.payfone.dto.PayfoneRequest;
+import com.syf.payfone.dto.PayfoneResponse;
+import com.syf.payfone.model.ExcelRecord;
+import com.syf.payfone.service.PayfoneApiService;
+import com.syf.payfone.service.builder.RequestBuilder;
+import com.syf.payfone.service.processor.RecordProcessor;
+import com.syf.payfone.service.validator.RecordValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+
+/**
+ * Default implementation of RecordProcessor
+ * Follows Single Responsibility Principle - only processes records
+ */
+@Component
+public class DefaultRecordProcessor<T extends ExcelRecord> implements RecordProcessor<T> {
+    
+    private static final Logger log = LoggerFactory.getLogger(DefaultRecordProcessor.class);
+    
+    private final RecordValidator<T> validator;
+    private final RequestBuilder<T> requestBuilder;
+    private final PayfoneApiService apiService;
+    
+    public DefaultRecordProcessor(
+            RecordValidator<T> validator,
+            RequestBuilder<T> requestBuilder,
+            PayfoneApiService apiService) {
+        this.validator = validator;
+        this.requestBuilder = requestBuilder;
+        this.apiService = apiService;
+    }
+    
+    @Override
+    public void process(T record) {
+        log.debug("Processing record with identifier: {}", record.getIdentifier());
+        
+        // Validate record
+        if (!validator.validate(record)) {
+            log.warn("Validation failed for record: {}", record.getIdentifier());
+            return; // Status already set by validator
+        }
+        
+        // Build API request
+        PayfoneRequest request = requestBuilder.build(record);
+        
+        // Call Payfone API
+        PayfoneResponse response = apiService.insertPayfoneRecord(request);
+        
+        // Update record status based on response
+        if (response != null && response.isSuccess()) {
+            record.setStatus("Success");
+            log.info("Successfully processed record: {}", record.getIdentifier());
+        } else {
+            String errorMessage = response != null && response.getResponse() != null 
+                ? response.getResponse().getMessage() 
+                : "API call failed";
+            record.setStatus("Failed: " + errorMessage);
+            log.error("Failed to process record: {}, error: {}", 
+                record.getIdentifier(), errorMessage);
+        }
+    }
+}

@@ -1,0 +1,71 @@
+package com.syf.payfone.service;
+
+import com.syf.payfone.dto.PayfoneRequest;
+import com.syf.payfone.dto.PayfoneResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+@Service
+public class PayfoneApiService {
+    
+    private static final Logger log = LoggerFactory.getLogger(PayfoneApiService.class);
+    
+    private final RestTemplate restTemplate;
+    
+    @Value("${payfone.api.base-url}")
+    private String baseUrl;
+    
+    @Value("${payfone.api.endpoint}")
+    private String endpoint;
+    
+    public PayfoneApiService(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+    
+    public PayfoneResponse insertPayfoneRecord(PayfoneRequest request) {
+        try {
+            String url = baseUrl + endpoint;
+            
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+            
+            HttpEntity<PayfoneRequest> entity = new HttpEntity<>(request, headers);
+            
+            log.debug("Calling Payfone API with transId: {}", request.getTransId());
+            
+            ResponseEntity<PayfoneResponse> response = restTemplate.postForEntity(
+                url, 
+                entity, 
+                PayfoneResponse.class
+            );
+            
+            PayfoneResponse payfoneResponse = response.getBody();
+            
+            if (payfoneResponse != null) {
+                log.debug("Received response for transId: {}, code: {}", 
+                    request.getTransId(), 
+                    payfoneResponse.getResponse() != null ? payfoneResponse.getResponse().getCode() : "null");
+            }
+            
+            return payfoneResponse;
+            
+        } catch (Exception e) {
+            log.error("Error calling Payfone API for transId: {}", request.getTransId(), e);
+            
+            // Return error response
+            PayfoneResponse errorResponse = new PayfoneResponse();
+            PayfoneResponse.Response response = new PayfoneResponse.Response();
+            response.setCode("ERROR");
+            response.setMessage("API call failed: " + e.getMessage());
+            errorResponse.setResponse(response);
+            return errorResponse;
+        }
+    }
+}

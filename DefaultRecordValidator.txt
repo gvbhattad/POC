@@ -1,0 +1,33 @@
+package com.syf.payfone.service.validator.impl;
+
+import com.syf.payfone.model.ExcelRecord;
+import com.syf.payfone.service.validator.RecordValidator;
+import org.springframework.stereotype.Component;
+
+import java.util.UUID;
+
+/**
+ * Default implementation of RecordValidator
+ * Can be used for both AccountNumber and CIF records
+ */
+@Component
+public class DefaultRecordValidator<T extends ExcelRecord> implements RecordValidator<T> {
+
+    @Override
+    public boolean validate(T record) {
+        // Generate transaction ID for all records
+        record.setTransactionId(generateTransactionId());
+        
+        // Check if record is valid
+        if (!record.isValid()) {
+            record.setStatus(record.getValidationError());
+            return false;
+        }
+        
+        return true;
+    }
+    
+    private String generateTransactionId() {
+        return "TXN-" + UUID.randomUUID().toString().replace("-", "").substring(0, 20);
+    }
+}

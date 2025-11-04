@@ -1,0 +1,65 @@
+package com.syf.payfone.model;
+
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Record for API 2 - CIF based processing
+ */
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class CifRecord implements ExcelRecord {
+    private String cif;
+    private String phoneNumber;
+    private String lineType;
+    private String confirmed;
+    private String ssn;
+    private String dob;
+    private String channelId;
+    private String transactionId;
+    private String status;
+
+    @Override
+    public String getIdentifier() {
+        return cif;
+    }
+
+    @Override
+    public Map<String, String> toMap() {
+        Map<String, String> map = new HashMap<>();
+        map.put("CIF", cif);
+        map.put("PhoneNumber", phoneNumber);
+        map.put("LineType", lineType);
+        map.put("Confirmed", confirmed);
+        map.put("SSN", ssn);
+        map.put("DOB", dob);
+        map.put("ChannelId", channelId);
+        map.put("TransactionID", transactionId);
+        map.put("Status", status);
+        return map;
+    }
+
+    @Override
+    public boolean isValid() {
+        return cif != null && !cif.trim().isEmpty() 
+            && phoneNumber != null && !phoneNumber.trim().isEmpty();
+    }
+
+    @Override
+    public String getValidationError() {
+        if (cif == null || cif.trim().isEmpty()) {
+            return "Mandatory field CIF is missing";
+        }
+        if (phoneNumber == null || phoneNumber.trim().isEmpty()) {
+            return "Mandatory field PhoneNumber is missing";
+        }
+        return null;
+    }
+}

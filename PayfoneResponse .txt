@@ -1,0 +1,52 @@
+package com.syf.payfone.dto;
+
+import lombok.Data;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+@Data
+public class PayfoneResponse {
+    @JsonProperty("transId")
+    private String transId;
+    
+    @JsonProperty("eventName")
+    private String eventName;
+    
+    @JsonProperty("eventTimestamp")
+    private String eventTimestamp;
+    
+    @JsonProperty("serverName")
+    private String serverName;
+    
+    @JsonProperty("requestMetadata")
+    private RequestMetadata requestMetadata;
+    
+    @JsonProperty("response")
+    private Response response;
+    
+    @Data
+    public static class RequestMetadata {
+        @JsonProperty("version")
+        private Object version;
+    }
+    
+    @Data
+    public static class Response {
+        @JsonProperty("code")
+        private String code;
+        
+        @JsonProperty("flag")
+        private String flag;
+        
+        @JsonProperty("message")
+        private String message;
+        
+        @JsonProperty("operation")
+        private String operation;
+    }
+    
+    public boolean isSuccess() {
+        return response != null 
+            && "EDLMYSQLUP000".equals(response.getCode()) 
+            && "Success".equals(response.getMessage());
+    }
+}

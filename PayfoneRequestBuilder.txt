@@ -1,0 +1,172 @@
+package com.syf.payfone.service.builder.impl;
+
+import com.syf.payfone.dto.PayfoneRequest;
+import com.syf.payfone.model.AccountNumberRecord;
+import com.syf.payfone.model.CifRecord;
+import com.syf.payfone.model.ExcelRecord;
+import com.syf.payfone.service.builder.RequestBuilder;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
+@Component
+public class PayfoneRequestBuilder<T extends ExcelRecord> implements RequestBuilder<T> {
+
+    @Value("${payfone.api.event-name}")
+    private String eventName;
+
+    @Value("${payfone.api.server-name}")
+    private String serverName;
+
+    @Value("${payfone.api.action}")
+    private String action;
+
+    @Value("${payfone.api.version.major}")
+    private String versionMajor;
+
+    @Value("${payfone.api.version.minor}")
+    private String versionMinor;
+
+    @Value("${payfone.api.version.patch}")
+    private String versionPatch;
+
+    @Value("${payfone.api.defaults.line-type}")
+    private String defaultLineType;
+
+    @Value("${payfone.api.defaults.carrier}")
+    private String defaultCarrier;
+
+    @Value("${payfone.api.defaults.country-code}")
+    private String defaultCountryCode;
+
+    @Value("${payfone.api.defaults.verified}")
+    private String defaultVerified;
+
+    @Value("${payfone.api.defaults.name-score}")
+    private String defaultNameScore;
+
+    @Value("${payfone.api.defaults.address-score}")
+    private String defaultAddressScore;
+
+    @Value("${payfone.api.defaults.event-type}")
+    private String defaultEventType;
+
+    @Value("${payfone.api.defaults.ssn}")
+    private String defaultSsn;
+
+    @Value("${payfone.api.defaults.dob}")
+    private String defaultDob;
+
+    @Value("${payfone.api.defaults.lexid}")
+    private String defaultLexid;
+
+    @Value("${payfone.api.defaults.syfid}")
+    private String defaultSyfid;
+
+    @Value("${payfone.api.defaults.tokenid}")
+    private String defaultTokenid;
+
+    @Value("${payfone.api.defaults.clientid}")
+    private String defaultClientid;
+
+    @Value("${payfone.api.defaults.sys}")
+    private String defaultSys;
+
+    @Value("${payfone.api.defaults.agent}")
+    private String defaultAgent;
+
+    @Value("${payfone.api.defaults.default-account-number}")
+    private String defaultAccountNumber;
+
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    
+    private static final DateTimeFormatter TIMESTAMP_FORMATTER_MILLIS = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS");
+    
+    private static final DateTimeFormatter DATE_FORMATTER = 
+        DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+    @Override
+    public PayfoneRequest build(T record) {
+        LocalDateTime now = LocalDateTime.now();
+        String currentTimestamp = now.format(TIMESTAMP_FORMATTER);
+        String currentTimestampMillis = now.format(TIMESTAMP_FORMATTER_MILLIS);
+        String currentDate = LocalDate.now().format(DATE_FORMATTER);
+        
+        String accountNumber;
+        String cif = "";
+        
+        if (record instanceof AccountNumberRecord) {
+            accountNumber = ((AccountNumberRecord) record).getAccountNumber();
+        } else if (record instanceof CifRecord) {
+            accountNumber = defaultAccountNumber;
+            cif = ((CifRecord) record).getCif();
+        } else {
+            accountNumber = record.getIdentifier();
+        }
+
+        return PayfoneRequest.builder()
+            .transId(record.getTransactionId())
+            .eventName(eventName)
+            .eventTimestamp(currentTimestamp)
+            .serverName(serverName)
+            .action(action)
+            .requestMetadata(PayfoneRequest.RequestMetadata.builder()
+                .version(PayfoneRequest.Version.builder()
+                    .major(versionMajor)
+                    .minor(versionMinor)
+                    .patch(versionPatch)
+                    .versionDate(currentTimestamp)
+                    .build())
+                .build())
+            .request(PayfoneRequest.PayfoneRecordRequest.builder()
+                .accountnumber(accountNumber)
+                .payfoneid(record.getPhoneNumber())
+                .phonenumber(record.getPhoneNumber())
+                .linetype(getValueOrDefault(record.getLineType(), defaultLineType))
+                .carrier(defaultCarrier)
+                .countrycode(defaultCountryCode)
+                .verified(getValueOrDefault(record.getConfirmed(), defaultVerified))
+                .namescore(defaultNameScore)
+                .addressscore(defaultAddressScore)
+                .eventtype(defaultEventType)
+                .ssn(getValueOrDefault(record.getSsn(), defaultSsn))
+                .dob(getValueOrDefault(record.getDob(), defaultDob))
+                .lexid(defaultLexid)
+                .syfid(defaultSyfid)
+                .tokenid(defaultTokenid)
+                .clientid(defaultClientid)
+                .sys(defaultSys)
+                .prin("")
+                .agent(defaultAgent)
+                .loaddatetime(currentTimestampMillis)
+                .details("")
+                .eventdate("")
+                .eventadditionalInfo("")
+                .reasoncodes("")
+                .lastcalldate("")
+                .statusflag("")
+                .acct_type("")
+                .cif(cif)
+                .phnsource("")
+                .firstloaddate(currentDate)
+                .velocity("")
+                .firstauthdate("")
+                .contactibility("")
+                .acctopendate("")
+                .email("")
+                .emailsource("")
+                .emailloaddate("")
+                .reubenrefreshdate("")
+                .build())
+            .build();
+    }
+
+    private String getValueOrDefault(String value, String defaultValue) {
+        return (value == null || value.trim().isEmpty()) ? defaultValue : value;
+    }
+}

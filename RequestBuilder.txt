@@ -1,0 +1,16 @@
+package com.syf.payfone.service.builder;
+
+import com.syf.payfone.dto.PayfoneRequest;
+import com.syf.payfone.model.ExcelRecord;
+
+/**
+ * Functional interface for building API requests
+ * @param <T> Type of ExcelRecord
+ */
+@FunctionalInterface
+public interface RequestBuilder<T extends ExcelRecord> {
+    /**
+     * Build Payfone API request from Excel record
+     */
+    PayfoneRequest build(T record);
+}
